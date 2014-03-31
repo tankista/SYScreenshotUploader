@@ -20,6 +20,8 @@
 
 @implementation SYAppDelegate
 
+
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     //Step 4. Initialte shared uploader and set dropbox app key and secret
@@ -31,6 +33,7 @@
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
 {
     //Step 5. handle open url for correctly handle authorisation
+    //url example: db-w5jgn38x9gg9rk8://1/connect?uid=8513459&oauth_token_secret=cbiauf7u9y10794&state=7BD0C58A-B409-4E84-BCBE-31A49A10D7F3&oauth_token=o6stzbi98q6bljws
     return [[SYScreenshotUploader sharedUploader] handleOpenURL:url];
 }
 

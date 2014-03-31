@@ -10,6 +10,8 @@
 #import <DropboxSDK/DropboxSDK.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 
+#import <objc/runtime.h>
+
 #define DEFAULT_HIDE_UPLOAD_VIEW_DELAY 4
 #define DEFAULT_ANIMATION_DURATION 0.25
 
@@ -29,6 +31,22 @@
 @property (nonatomic, readonly) DBRestClient *restClient;
 
 void SYAlertNoTitle(NSString* message);
+
+@end
+
+@interface UIApplication (OpenUrlSwizzle)
+
+- (BOOL)SYSU_openURL:(NSURL *)URL;
+
+@end
+
+@implementation UIApplication (OpenUrlSwizzle)
+
+- (BOOL)SYSU_openURL:(NSURL *)URL;
+{
+    NSLog(@"%@", URL);
+    return [self SYSU_openURL:URL];
+}
 
 @end
 
@@ -59,6 +77,16 @@ void SYAlertNoTitle(NSString* message);
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+static inline void Swizzle(Class c, SEL orig, SEL new)
+{
+    Method origMethod = class_getInstanceMethod(c, orig);
+    Method newMethod = class_getInstanceMethod(c, new);
+    if(class_addMethod(c, orig, method_getImplementation(newMethod), method_getTypeEncoding(newMethod)))
+        class_replaceMethod(c, new, method_getImplementation(origMethod), method_getTypeEncoding(origMethod));
+    else
+        method_exchangeImplementations(origMethod, newMethod);
+}
+
 #pragma mark
 #pragma mark Public Class Methods
 
@@ -69,6 +97,7 @@ void SYAlertNoTitle(NSString* message);
     
     dispatch_once(&onceToken, ^{
         sharedInstance = [[self alloc] init];
+        Swizzle([UIApplication class], @selector(openURL:), @selector(SYSU_openURL:));
     });
     
     return sharedInstance;
