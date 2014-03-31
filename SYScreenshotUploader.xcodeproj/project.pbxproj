@@ -62,6 +62,7 @@
 		4276C2C918E999F200FDCB19 /* SYScreenshotUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SYScreenshotUploader.h; sourceTree = "<group>"; };
 		4276C2CA18E999F200FDCB19 /* SYScreenshotUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SYScreenshotUploader.m; sourceTree = "<group>"; };
 		4276C2CE18E99A4600FDCB19 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = "<group>"; };
+		4276C2D118E9C65300FDCB19 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +94,7 @@
 		4276C28518E9990300FDCB19 = {
 			isa = PBXGroup;
 			children = (
+				4276C2D118E9C65300FDCB19 /* README.md */,
 				4276C29718E9990300FDCB19 /* SYScreenshotUploader */,
 				4276C2B918E9990400FDCB19 /* SYScreenshotUploaderTests */,
 				4276C29018E9990300FDCB19 /* Frameworks */,

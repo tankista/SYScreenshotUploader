@@ -10,19 +10,22 @@
 #import <DropboxSDK/DropboxSDK.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 
-@interface SYSendScreenshotView : UIView
+#define DEFAULT_HIDE_UPLOAD_VIEW_DELAY 4
+#define DEFAULT_ANIMATION_DURATION 0.25
 
-- (void)setUploadProgress:(CGFloat)progress animated:(BOOL)animated;
+@interface SYUploadScreenshotView : UIToolbar
+
 - (void)addTargetForTouchUpInside:(id)target action:(SEL)action;
 - (void)beginProgress;
 - (void)endProgress;
+- (void)setUploadProgress:(CGFloat)progress animated:(BOOL)animated;
 
 @end
 
 @interface SYScreenshotUploader () <DBRestClientDelegate, DBSessionDelegate>
 
 @property (nonatomic, readonly) UIWindow* window;
-@property (nonatomic, readonly) SYSendScreenshotView* sendScreenshotView;
+@property (nonatomic, readonly) SYUploadScreenshotView* uploadScreenshotView;   //TODO: probably make this public for customizations
 @property (nonatomic, readonly) DBRestClient *restClient;
 
 void SYAlertNoTitle(NSString* message);
@@ -31,14 +34,14 @@ void SYAlertNoTitle(NSString* message);
 
 @implementation SYScreenshotUploader
 {
-    BOOL    _isShowingSendScreenshotView;
-    BOOL    _isLinkingDropboxInProgress;
     ALAssetsLibrary*    _assetsLibrary;
-    UIImage*    _lastTakenScreenshot;
+    BOOL                _isLinkingDropboxInProgress;
+    BOOL                _isShowingUploadScreenshotView;
+    UIImage*            _lastTakenScreenshot;
 }
 
-@synthesize sendScreenshotView = _sendScreenshotView;
 @synthesize restClient = _restClient;
+@synthesize uploadScreenshotView = _uploadScreenshotView;
 
 - (id)init
 {
@@ -95,6 +98,14 @@ void SYAlertNoTitle(NSString* message);
 #pragma mark
 #pragma mark Private Methods
 
+- (NSUInteger)hideUploadViewAfterDelay
+{
+    if (_hideUploadViewAfterDelay == 0) {
+        _hideUploadViewAfterDelay = DEFAULT_HIDE_UPLOAD_VIEW_DELAY;
+    }
+    return _hideUploadViewAfterDelay;
+}
+
 - (NSString*)productName
 {
     return [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
@@ -106,6 +117,29 @@ void SYAlertNoTitle(NSString* message);
         _assetsLibrary = [[ALAssetsLibrary alloc] init];
     }
     return _assetsLibrary;
+}
+
+- (UIWindow *)window
+{
+    return [[UIApplication sharedApplication] keyWindow];
+}
+
+- (UIView *)uploadScreenshotView
+{
+    if (!_uploadScreenshotView) {
+        CGRect screenFrame = self.window.bounds;
+        CGRect frame = CGRectMake(0, 0, screenFrame.size.width, 64);
+        _uploadScreenshotView = [[SYUploadScreenshotView alloc] initWithFrame:frame];
+    }
+    return _uploadScreenshotView;
+}
+
+- (DBRestClient *)restClient {
+    if (!_restClient) {
+        _restClient = [[DBRestClient alloc] initWithSession:[DBSession sharedSession]];
+        _restClient.delegate = self;
+    }
+    return _restClient;
 }
 
 - (void)uploadLastDetectedScreenshot
@@ -129,7 +163,7 @@ void SYAlertNoTitle(NSString* message);
                     
                     NSString *destDir = [NSString stringWithFormat:@"/%@/", [self productName]];
                     
-                    [self prepareScreenshotViewForUpload];
+                    [self prepareUploadScreenshotViewForUpload];
                     
                     [self.restClient uploadFile:fileName toPath:destDir withParentRev:nil fromPath:filePath];
                     
@@ -144,118 +178,97 @@ void SYAlertNoTitle(NSString* message);
     }];
 }
 
-- (DBRestClient *)restClient {
-    if (!_restClient) {
-        _restClient = [[DBRestClient alloc] initWithSession:[DBSession sharedSession]];
-        _restClient.delegate = self;
-    }
-    return _restClient;
-}
-
 - (void)handleScreenshot:(NSNotification*)notification
 {
-    [self.sendScreenshotView addTargetForTouchUpInside:self action:@selector(handleSendScreenshotButton:)];
+    [self.uploadScreenshotView addTargetForTouchUpInside:self action:@selector(handleUploadScreenshotButton:)];
     
     [UIView cancelPreviousPerformRequestsWithTarget:self];
     [self show:YES screenshotViewAnimated:NO];
-    [self hideSendScreenshotViewAfterDelayAnimated];
+    [self hideUploadScreenshotViewAfterDelayAnimated];
 }
 
-- (void)handleSendScreenshotButton:(UIButton*)button
+- (void)handleUploadScreenshotButton:(UIButton*)button
 {
     [UIView cancelPreviousPerformRequestsWithTarget:self];
     
     if ([[DBSession sharedSession] isLinked] == NO) {
-        [[DBSession sharedSession] linkFromController:nil];
         _isLinkingDropboxInProgress = YES;
+        [[DBSession sharedSession] linkFromController:nil];
     }
     else {
         [self uploadLastDetectedScreenshot];
     }
 }
 
-- (UIWindow *)window
-{
-    return [[UIApplication sharedApplication] keyWindow];
-}
-
-- (UIView *)sendScreenshotView
-{
-    if (!_sendScreenshotView) {
-        CGRect screenFrame = self.window.bounds;
-        CGRect frame = CGRectMake(0, 0, screenFrame.size.width, 64);
-        _sendScreenshotView = [[SYSendScreenshotView alloc] initWithFrame:frame];
-    }
-    return _sendScreenshotView;
-}
-
 #pragma mark
 #pragma mark Show/Hide Screenshot View Methods
 
-- (void)hideSendScreenshotViewAfterDelayAnimated
+- (void)hideUploadScreenshotViewAfterDelayAnimated
 {
-    [self performSelector:@selector(hideSendScreenshotViewAnimated) withObject:nil afterDelay:4];
+    [self performSelector:@selector(hideUploadScreenshotViewAnimated) withObject:nil afterDelay:self.hideUploadViewAfterDelay];
 }
 
-- (void)showSendScreenshotViewAnimated
+- (void)showUploadScreenshotViewAnimated
 {
     [self show:YES screenshotViewAnimated:YES];
 }
 
-- (void)hideSendScreenshotViewAnimated
+- (void)hideUploadScreenshotViewAnimated
 {
     [self show:NO screenshotViewAnimated:YES];
 }
 
 - (void)show:(BOOL)show screenshotViewAnimated:(BOOL)animated
 {
-    if ((_isShowingSendScreenshotView && show) || (_isShowingSendScreenshotView == NO && show == NO)) {
+    if ((_isShowingUploadScreenshotView && show) || (_isShowingUploadScreenshotView == NO && show == NO)) {
         return;
     }
     
     if (show) {
-        CGRect frame = self.sendScreenshotView.frame;
+        CGRect frame = self.uploadScreenshotView.frame;
         frame.origin.y = - CGRectGetHeight(frame);
-        self.sendScreenshotView.frame = frame;
-        [self.window addSubview:self.sendScreenshotView];
+        self.uploadScreenshotView.frame = frame;
+        [self.window addSubview:self.uploadScreenshotView];
     }
 
-    [UIView animateWithDuration:animated?0.3:0.0 animations:^{
+    [UIView animateWithDuration:animated?DEFAULT_ANIMATION_DURATION:0.0 animations:^{
         
         if (show) {
-            CGRect frame = self.sendScreenshotView.frame;
+            CGRect frame = self.uploadScreenshotView.frame;
             frame.origin.y = 0;
-            self.sendScreenshotView.frame = frame;
+            self.uploadScreenshotView.frame = frame;
+            [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
         }
         else {
-            CGRect frame = self.sendScreenshotView.frame;
+            CGRect frame = self.uploadScreenshotView.frame;
             frame.origin.y = - CGRectGetHeight(frame);
-            self.sendScreenshotView.frame = frame;
+            self.uploadScreenshotView.frame = frame;
         }
         
     } completion:^(BOOL finished) {
         
         if (show) {
-            _isShowingSendScreenshotView = YES;
+            _isShowingUploadScreenshotView = YES;
         }
         else {
-            _isShowingSendScreenshotView = NO;
-            [self.sendScreenshotView removeFromSuperview];
+            _isShowingUploadScreenshotView = NO;
+            [self.uploadScreenshotView removeFromSuperview];
         }
         
     }];
 }
 
-- (void)prepareScreenshotViewForUpload
+- (void)prepareUploadScreenshotViewForUpload
 {
-    [self.sendScreenshotView beginProgress];
+    [self.uploadScreenshotView beginProgress];
     
-    CGRect frame = self.sendScreenshotView.frame;
+    CGRect frame = self.uploadScreenshotView.frame;
     frame.origin.y = - CGRectGetHeight(frame) + 2;
     
-    [UIView animateWithDuration:0.3 animations:^{
+    [UIView animateWithDuration:DEFAULT_ANIMATION_DURATION animations:^{
         
-        self.sendScreenshotView.frame = frame;
+        self.uploadScreenshotView.frame = frame;
+        [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
         
     } completion:^(BOOL finished) {
         
@@ -285,12 +298,12 @@ void SYAlertNoTitle(NSString* message);
         }
     }
     [self show:NO screenshotViewAnimated:YES];
-    [self.sendScreenshotView endProgress];
+    [self.uploadScreenshotView endProgress];
 }
 
 - (void)restClient:(DBRestClient*)client uploadProgress:(CGFloat)progress forFile:(NSString*)destPath from:(NSString*)srcPath
 {
-    [self.sendScreenshotView setUploadProgress:progress animated:YES];
+    [self.uploadScreenshotView setUploadProgress:progress animated:YES];
 }
 
 - (void)restClient:(DBRestClient*)client uploadFileFailedWithError:(NSError*)error {
@@ -298,7 +311,7 @@ void SYAlertNoTitle(NSString* message);
     SYAlertNoTitle([error localizedDescription]);
     
     [self show:NO screenshotViewAnimated:YES];
-    [self.sendScreenshotView endProgress];
+    [self.uploadScreenshotView endProgress];
 }
 
 @end
@@ -313,17 +326,18 @@ void SYAlertNoTitle(NSString* message)
     [alert show];
 }
 
-@implementation SYSendScreenshotView
+@implementation SYUploadScreenshotView
 {
-    UIButton*   _button;
-    CALayer*    _uploadProgressLayer;
-    UIProgressView* _progressView;
+    UIButton*           _button;
+    CALayer*            _uploadProgressLayer;
+    UIProgressView*     _progressView;
 }
 
 - (id)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
-        self.backgroundColor = [UIColor redColor];
+        self.backgroundColor = [UIColor clearColor];
+        self.barTintColor = [UIColor redColor];
         _button = [UIButton buttonWithType:UIButtonTypeCustom];
         _button.frame = CGRectZero;
         [_button setTitle:NSLocalizedString(@"Upload to Dropbox", nil) forState:UIControlStateNormal];
@@ -336,7 +350,15 @@ void SYAlertNoTitle(NSString* message)
 {
     [super layoutSubviews];
     
-    _button.frame = CGRectOffset(CGRectInset(self.bounds, 0, 10), 0, 10);
+    BOOL viewControllerStatusBarAppearance = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIViewControllerBasedStatusBarAppearance"] boolValue];
+    if (viewControllerStatusBarAppearance) {
+        _button.frame = CGRectOffset(CGRectInset(self.bounds, 0, 10), 0, 10);
+    }
+    else {
+        _button.frame = self.bounds;
+    }
+    
+    _progressView.frame = CGRectMake(0, CGRectGetHeight(self.frame) - 2, CGRectGetWidth(self.frame), 2);
 }
 
 - (void)addTargetForTouchUpInside:(id)target action:(SEL)action
@@ -346,25 +368,27 @@ void SYAlertNoTitle(NSString* message)
 
 - (void)setUploadProgress:(CGFloat)progress animated:(BOOL)animated
 {
-    if (!_progressView) {
-        _progressView = [[UIProgressView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.frame) - 2, CGRectGetWidth(self.frame), 2)];
-        _progressView.tintColor = [UIColor blueColor];
-    }
-    
     [_progressView setProgress:progress animated:YES];
 }
 
 - (void)beginProgress
 {
-    [self addSubview:_progressView];
+    if (!_progressView) {
+        _progressView = [[UIProgressView alloc] initWithFrame:CGRectZero];
+        _progressView.tintColor = [UIColor blueColor];
+        _progressView.alpha = 0.0;
+        [self addSubview:_progressView];
+    }
+    
+    _progressView.alpha = 1.0;
+    [_progressView setProgress:0.0 animated:NO];
 }
 
 - (void)endProgress
 {
-    [_progressView removeFromSuperview];
+    [UIView animateWithDuration:DEFAULT_ANIMATION_DURATION animations:^{
+        _progressView.alpha = 0.0;
+    }];
 }
-
-#pragma mark
-#pragma mark Private Methods
 
 @end
