@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>AB640D12-4713-4731-8691-FD821EEC48BE</string>
+	<key>IDESourceControlProjectName</key>
+	<string>SYScreenshotUploader</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>327FF24C-56C7-4343-AF84-7F0703851C57</key>
+		<string>https://github.com/tankista/SYScreenshotUploader.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>SYScreenshotUploader/SYScreenshotUploader.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>327FF24C-56C7-4343-AF84-7F0703851C57</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/tankista/SYScreenshotUploader.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>327FF24C-56C7-4343-AF84-7F0703851C57</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>327FF24C-56C7-4343-AF84-7F0703851C57</string>
+			<key>IDESourceControlWCCName</key>
+			<string>SYScreenshotUploader</string>
+		</dict>
+	</array>
+</dict>
+</plist>
