@@ -8,6 +8,7 @@
 
 #import "SYScreenshotUploader.h"
 #import <DropboxSDK/DropboxSDK.h>
+#import <DropboxSDK/DBSession+iOS.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 
 #import <objc/runtime.h>
@@ -31,22 +32,6 @@
 @property (nonatomic, readonly) DBRestClient *restClient;
 
 void SYAlertNoTitle(NSString* message);
-
-@end
-
-@interface UIApplication (OpenUrlSwizzle)
-
-- (BOOL)SYSU_openURL:(NSURL *)URL;
-
-@end
-
-@implementation UIApplication (OpenUrlSwizzle)
-
-- (BOOL)SYSU_openURL:(NSURL *)URL;
-{
-    NSLog(@"%@", URL);
-    return [self SYSU_openURL:URL];
-}
 
 @end
 
@@ -77,16 +62,6 @@ void SYAlertNoTitle(NSString* message);
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-static inline void Swizzle(Class c, SEL orig, SEL new)
-{
-    Method origMethod = class_getInstanceMethod(c, orig);
-    Method newMethod = class_getInstanceMethod(c, new);
-    if(class_addMethod(c, orig, method_getImplementation(newMethod), method_getTypeEncoding(newMethod)))
-        class_replaceMethod(c, new, method_getImplementation(origMethod), method_getTypeEncoding(origMethod));
-    else
-        method_exchangeImplementations(origMethod, newMethod);
-}
-
 #pragma mark
 #pragma mark Public Class Methods
 
@@ -97,7 +72,6 @@ static inline void Swizzle(Class c, SEL orig, SEL new)
     
     dispatch_once(&onceToken, ^{
         sharedInstance = [[self alloc] init];
-        Swizzle([UIApplication class], @selector(openURL:), @selector(SYSU_openURL:));
     });
     
     return sharedInstance;
@@ -311,7 +285,10 @@ static inline void Swizzle(Class c, SEL orig, SEL new)
 
 - (void)sessionDidReceiveAuthorizationFailure:(DBSession *)session userId:(NSString *)userId
 {
-    SYAlertNoTitle([NSString stringWithFormat:@"Did receive auth failure for user %@", userId]);
+    NSLog(@"Did receive auth failure for user %@", userId);
+    
+    [[DBSession sharedSession] unlinkAll];
+    [self handleUploadScreenshotButton:nil];
 }
 
 #pragma mark
