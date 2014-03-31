@@ -157,11 +157,13 @@ void SYAlertNoTitle(NSString* message);
                     
                     NSData *imageData = UIImagePNGRepresentation(_lastTakenScreenshot);
                     
-                    NSString *fileName = [NSString stringWithFormat:@"screenshot-%f.png", [[NSDate date] timeIntervalSince1970]];
+                    NSString *productName = [self productName];
+                    
+                    NSString *fileName = [NSString stringWithFormat:@"%@-%f.png", [productName lowercaseString], [[NSDate date] timeIntervalSince1970]];
                     NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
                     [imageData writeToFile:filePath atomically:YES];
                     
-                    NSString *destDir = [NSString stringWithFormat:@"/%@/", [self productName]];
+                    NSString *destDir = [NSString stringWithFormat:@"/%@/", productName];
                     
                     [self prepareUploadScreenshotViewForUpload];
                     
