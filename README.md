@@ -7,7 +7,7 @@ Small component for iOS developers who send screenshots to designers very often 
 
 ###Import uploader and dropbox files
 
-Drag and drop SYScreenshotUploader.h, SYScreenshotUploader.m files into your project. Download DropboxSDK.framework at https://www.dropbox.com/developers/core/sdks/ios and drag and drop framework file into your project.  
+Drag and drop `SYScreenshotUploader.h`, `SYScreenshotUploader.m` files into your project. Download `DropboxSDK.framework` at https://www.dropbox.com/developers/core/sdks/ios and drag and drop framework file into your project.  
 
 ###Create Dropbox app
 
