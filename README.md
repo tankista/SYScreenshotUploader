@@ -1,7 +1,7 @@
 SYScreenshotUploader
 ====================
 
-Small component for iOS apps that detects screenshot and upload it to linked dropbox folder. This is development tool that should help sharing screenshots between developers and designers.
+Small component for iOS developers who send screenshots to designers very often and hate the process of opening Photos app and sending photos via iMessage or email. Uploader detects any screenshot that user make and uploads it to Dropbox. There you can share folder or just send screens without pain.
 
 ##Integration
 
