@@ -5,11 +5,11 @@ Small component for iOS developers who send screenshots to designers very often 
 
 ##Integration
 
-###Import uploader and dropbox files
+###Step 1: Import uploader and dropbox files
 
 Drag and drop `SYScreenshotUploader.h`, `SYScreenshotUploader.m` files into your project. Download `DropboxSDK.framework` at https://www.dropbox.com/developers/core/sdks/ios and drag and drop framework file into your project.  
 
-###Create Dropbox app
+###Step 2: Create Dropbox app
 
 Go to https://www.dropbox.com/developers/apps/create and create new Dropbox API app. Current version of Screenshot Uploder supports only sandboxed Dropbox app. This means that it will create a folder with your new app name in dropbox root/Apps and all screenshots will be uploaded here.
 
@@ -20,14 +20,14 @@ Unfortunatelly, Dropbox SDK will redirect to your app using URL schemes when aut
 
 If you plan to allow Screenshot Uploader also to Ad Hoc testers, make sure that you 'Enable Development Users' in your Dropbox app's details.
 
-###Register URL Scheme
+###Step 3: Register URL Scheme
 
 Register your dropbox's app to correct URL scheme (db-DROPBOX_APP_KEY) in Info.plist. This will ensure that after successful authorisation iOS will redirect you from Dropbox app to your app.
 
-###Link with AssetsLibrary.framework
+###Step 4: Link with AssetsLibrary.framework
 Go to your project's target -> Link Binary With Libraries add AssetsLibrary.framework
 
-###Implementation
+###Step 5: Implementation
 
 In your app's app delegate implementation file import header and define keys
 
