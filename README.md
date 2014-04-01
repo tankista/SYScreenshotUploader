@@ -22,6 +22,9 @@ Unfortunatelly, Dropbox SDK will redirect to your app using URL schemes when aut
 
 Register your dropbox's app to correct URL scheme (db-DROPBOX_APP_KEY) in Info.plist. This will ensure that after successful authorisation iOS will redirect you from Dropbox app to your app.
 
+###Link with AssetsLibrary.framework
+Go to your project's target -> Link Binary With Libraries add AssetsLibrary.framework
+
 ###Implementation
 
 In your app's app delegate implementation file import header and define keys
