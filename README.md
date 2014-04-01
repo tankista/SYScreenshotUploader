@@ -18,6 +18,8 @@ Unfortunatelly, Dropbox SDK will redirect to your app using URL schemes when aut
 1. before authorising your app with Dropbox, delete all other apps that uses Screenshot Uplaoder.
 2. contact Dropbox and ask them to implement custom URL schemes support.
 
+If you plan to allow Screenshot Uploader also to Ad Hoc testers, make sure that you 'Enable Development Users' in your Dropbox app's details.
+
 ###Register URL Scheme
 
 Register your dropbox's app to correct URL scheme (db-DROPBOX_APP_KEY) in Info.plist. This will ensure that after successful authorisation iOS will redirect you from Dropbox app to your app.
