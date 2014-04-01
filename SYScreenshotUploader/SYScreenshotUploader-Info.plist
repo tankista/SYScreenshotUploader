@@ -27,7 +27,6 @@
 			<string>com.tankista.uploader</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>db-screenshotuploader</string>
 				<string>db-w5jgn38x9gg9rk8</string>
 			</array>
 		</dict>

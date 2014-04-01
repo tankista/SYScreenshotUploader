@@ -39,9 +39,9 @@
 }
 
 
-- (void)applicationDidEnterBackground:(UIApplication *)application
-{
-    [[DBSession sharedSession] unlinkAll];
-}
+//- (void)applicationDidEnterBackground:(UIApplication *)application
+//{
+//    [[DBSession sharedSession] unlinkAll];
+//}
 
 @end

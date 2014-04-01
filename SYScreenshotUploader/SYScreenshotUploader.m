@@ -15,6 +15,7 @@
 
 #define DEFAULT_HIDE_UPLOAD_VIEW_DELAY 4
 #define DEFAULT_ANIMATION_DURATION 0.25
+#define __WEAK_SELF __weak typeof (self) weakSelf = self
 
 @interface SYUploadScreenshotView : UIToolbar
 
@@ -148,6 +149,7 @@ void SYAlertNoTitle(NSString* message);
 - (void)uploadLastDetectedScreenshot
 {
     ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
+    
     [assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
         if (nil != group) {
             // be sure to filter the group so you only get photos
@@ -344,8 +346,7 @@ void SYAlertNoTitle(NSString* message)
 - (id)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
-        self.backgroundColor = [UIColor clearColor];
-        self.barTintColor = [UIColor redColor];
+        self.barTintColor = [UIColor greenColor];
         _button = [UIButton buttonWithType:UIButtonTypeCustom];
         _button.frame = CGRectZero;
         [_button setTitle:NSLocalizedString(@"Upload to Dropbox", nil) forState:UIControlStateNormal];
