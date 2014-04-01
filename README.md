@@ -16,7 +16,11 @@ Go to https://www.dropbox.com/developers/apps/create and create new Dropbox API 
 Unfortunatelly, Dropbox SDK will redirect to your app using URL schemes when authorisating your app. So it means that each your app must have it's own dropbox app in order to redirect you to correct app. If you wish to have only 1 dropbox app and upload screenshots from your muplitple apps, this will not work correctly since iOS will not be able to decide where to redirect. There are 2 workarounds for this:
 
 1. before authorising your app with Dropbox, delete all other apps that uses Screenshot Uplaoder.
-2. reimplement Dropbox SDK from scratch and set separate URL scheme for each app using Screenshot Uploader.
+2. contact Dropbox and ask them to implement custom URL schemes support.
+
+###Register URL Scheme
+
+Register your dropbox's app to correct URL scheme (db-DROPBOX_APP_KEY) in Info.plist. This will ensure that after successful authorisation iOS will redirect you from Dropbox app to your app.
 
 ###Implementation
 
@@ -27,8 +31,6 @@ In your app's app delegate implementation file import header and define keys
 #define DROPBOX_APP_KEY @"your dropbox app key"
 #define DROPBOX_APP_SECRET @"your dropbox app secret"
 ```
-
-Register your dropbox's app to correct URL scheme (db-DROPBOX_APP_KEY) in Info.plist. This will ensure that after successful authorisation iOS will redirect you from Dropbox app to your app.
 
 Initiate shared uploader and pass Dropbox keys:
 
@@ -45,6 +47,6 @@ Handle open url for correctly handle authorisation:
 ```objC
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
 {
-  return [[SYScreenshotUploader sharedUploader] handleOpenURL:url];
+    return [[SYScreenshotUploader sharedUploader] handleOpenURL:url];
 }
 ```
