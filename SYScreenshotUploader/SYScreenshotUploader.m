@@ -244,13 +244,14 @@ void SYAlertNoTitle(NSString* message);
             CGRect frame = self.uploadScreenshotView.frame;
             frame.origin.y = 0;
             self.uploadScreenshotView.frame = frame;
-            [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
         }
         else {
             CGRect frame = self.uploadScreenshotView.frame;
             frame.origin.y = - CGRectGetHeight(frame);
             self.uploadScreenshotView.frame = frame;
         }
+        
+        [[UIApplication sharedApplication] setStatusBarHidden:show withAnimation:UIStatusBarAnimationFade];
         
     } completion:^(BOOL finished) {
         
