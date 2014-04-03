@@ -32,7 +32,7 @@
 @property (nonatomic, readonly) SYUploadScreenshotView* uploadScreenshotView;   //TODO: probably make this public for customizations
 @property (nonatomic, readonly) DBRestClient *restClient;
 
-void SYAlertNoTitle(NSString* message);
+void AlertNoTitle(NSString* message);
 
 @end
 
@@ -181,7 +181,7 @@ void SYAlertNoTitle(NSString* message);
         
         *stop = NO;
     } failureBlock:^(NSError *error) {
-        SYAlertNoTitle([error localizedDescription]);
+        AlertNoTitle([error localizedDescription]);
     }];
 }
 
@@ -319,7 +319,7 @@ void SYAlertNoTitle(NSString* message);
 
 - (void)restClient:(DBRestClient*)client uploadFileFailedWithError:(NSError*)error {
     NSLog(@"File upload failed with error - %@", error);
-    SYAlertNoTitle([error localizedDescription]);
+    AlertNoTitle([error localizedDescription]);
     
     [self show:NO screenshotViewAnimated:YES];
     [self.uploadScreenshotView endProgress];
@@ -327,7 +327,7 @@ void SYAlertNoTitle(NSString* message);
 
 @end
 
-void SYAlertNoTitle(NSString* message)
+void AlertNoTitle(NSString* message)
 {
     UIAlertView* alert = [[UIAlertView alloc] initWithTitle:nil
                                                     message:message
