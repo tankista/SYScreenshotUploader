@@ -8,14 +8,20 @@
 
 #import "SYScreenshotUploader.h"
 #import <DropboxSDK/DropboxSDK.h>
-#import <DropboxSDK/DBSession+iOS.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 
 #import <objc/runtime.h>
 
+NSString * const SYScreenshotUploaderDropboxAppKey = @"com.getdropbox.Dropbox";
+
 #define DEFAULT_HIDE_UPLOAD_VIEW_DELAY 4
 #define DEFAULT_ANIMATION_DURATION 0.25
+
 #define __WEAK_SELF __weak typeof (self) weakSelf = self
+#define SYSU_RGBCOLOR(r,g,b) [UIColor colorWithRed:(r)/255.0f green:(g)/255.0f blue:(b)/255.0f alpha:1]
+#define SYSU_DROPBOX_BLUE_COLOR SYSU_RGBCOLOR(16, 129, 222)
+
+void AlertNoTitle(NSString* message);
 
 @interface SYUploadScreenshotView : UIToolbar
 
@@ -31,8 +37,6 @@
 @property (nonatomic, readonly) UIWindow* window;
 @property (nonatomic, readonly) SYUploadScreenshotView* uploadScreenshotView;   //TODO: probably make this public for customizations
 @property (nonatomic, readonly) DBRestClient *restClient;
-
-void SYAlertNoTitle(NSString* message);
 
 @end
 
@@ -168,11 +172,9 @@ void SYAlertNoTitle(NSString* message);
                     NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
                     [imageData writeToFile:filePath atomically:YES];
                     
-                    NSString *destDir = [NSString stringWithFormat:@"/%@/", productName];
-                    
                     [self prepareUploadScreenshotViewForUpload];
                     
-                    [self.restClient uploadFile:fileName toPath:destDir withParentRev:nil fromPath:filePath];
+                    [self.restClient uploadFile:fileName toPath:@"/" withParentRev:nil fromPath:filePath];
                     
                     *stop = YES;
                 }
@@ -181,7 +183,7 @@ void SYAlertNoTitle(NSString* message);
         
         *stop = NO;
     } failureBlock:^(NSError *error) {
-        SYAlertNoTitle([error localizedDescription]);
+        AlertNoTitle([error localizedDescription]);
     }];
 }
 
@@ -319,7 +321,7 @@ void SYAlertNoTitle(NSString* message);
 
 - (void)restClient:(DBRestClient*)client uploadFileFailedWithError:(NSError*)error {
     NSLog(@"File upload failed with error - %@", error);
-    SYAlertNoTitle([error localizedDescription]);
+    AlertNoTitle([error localizedDescription]);
     
     [self show:NO screenshotViewAnimated:YES];
     [self.uploadScreenshotView endProgress];
@@ -327,7 +329,8 @@ void SYAlertNoTitle(NSString* message);
 
 @end
 
-void SYAlertNoTitle(NSString* message)
+
+void AlertNoTitle(NSString* message)
 {
     UIAlertView* alert = [[UIAlertView alloc] initWithTitle:nil
                                                     message:message
@@ -347,9 +350,11 @@ void SYAlertNoTitle(NSString* message)
 - (id)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
-        self.barTintColor = [UIColor greenColor];
+        self.barTintColor = SYSU_DROPBOX_BLUE_COLOR;
         _button = [UIButton buttonWithType:UIButtonTypeCustom];
         _button.frame = CGRectZero;
+        [_button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_button setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
         [_button setTitle:NSLocalizedString(@"Upload to Dropbox", nil) forState:UIControlStateNormal];
         [self addSubview:_button];
     }
@@ -361,12 +366,10 @@ void SYAlertNoTitle(NSString* message)
     [super layoutSubviews];
     
     BOOL viewControllerStatusBarAppearance = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIViewControllerBasedStatusBarAppearance"] boolValue];
-    if (viewControllerStatusBarAppearance) {
+    if (viewControllerStatusBarAppearance)
         _button.frame = CGRectOffset(CGRectInset(self.bounds, 0, 10), 0, 10);
-    }
-    else {
+    else
         _button.frame = self.bounds;
-    }
     
     _progressView.frame = CGRectMake(0, CGRectGetHeight(self.frame) - 2, CGRectGetWidth(self.frame), 2);
 }
@@ -385,7 +388,7 @@ void SYAlertNoTitle(NSString* message)
 {
     if (!_progressView) {
         _progressView = [[UIProgressView alloc] initWithFrame:CGRectZero];
-        _progressView.tintColor = [UIColor blueColor];
+        _progressView.tintColor = SYSU_DROPBOX_BLUE_COLOR;
         _progressView.alpha = 0.0;
         [self addSubview:_progressView];
     }

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
+extern NSString * const SYScreenshotUploaderDropboxAppKey;
 
 @interface SYScreenshotUploader : NSObject
 
@@ -20,6 +21,7 @@
  * If user does not upload screenshot, send screenshot view is dismissed after a delay.
  */
 @property (nonatomic, assign) NSUInteger hideUploadViewAfterDelay;
+
 
 /**
  * Initiate shared uploader in your app's application:didFinishLaunchingWithOptions: method.
