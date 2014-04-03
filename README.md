@@ -27,10 +27,10 @@ If you plan to allow Screenshot Uploader also to Ad Hoc testers, make sure that 
 
 ###Step 3: Register URL Scheme
 
-Register your dropbox's app to correct URL scheme (db-DROPBOX_APP_KEY) in Info.plist. This will ensure that after successful authorisation iOS will redirect you from Dropbox app to your app.
+Register your dropbox's app to correct URL scheme (*db-DROPBOX_APP_KEY*) in `Info.plist`. This will ensure that after successful authorisation iOS will redirect you from Dropbox to your app.
 
 ###Step 4: Link with AssetsLibrary.framework
-Go to your project's target -> Link Binary With Libraries add AssetsLibrary.framework
+Go to your project's *target* -> *Link Binary With Libraries* add `AssetsLibrary.framework`
 
 ###Step 5: Implementation
 
