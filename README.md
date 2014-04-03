@@ -17,10 +17,11 @@ Drag and drop `SYScreenshotUploader.h`, `SYScreenshotUploader.m` files into your
 
 Go to https://www.dropbox.com/developers/apps/create and create new Dropbox API app. Current version of Screenshot Uploder supports only sandboxed Dropbox app. This means that it will create a folder with your new app name in dropbox root/Apps and all screenshots will be uploaded here.
 
-Unfortunatelly, Dropbox SDK will redirect to your app using URL schemes when authorisating your app. So it means that each your app must have it's own dropbox app in order to redirect you to correct app. If you wish to have only 1 dropbox app and upload screenshots from your muplitple apps, this will not work correctly since iOS will not be able to decide where to redirect. There are 2 workarounds for this:
+Unfortunatelly, Dropbox SDK will redirect to your app using URL schemes when finished authorisating. It means that each your app must have it's own Dropbox app equivalen in order to redirect you to correctly. If you wish to have only 1 Dropbox app and upload screenshots from your muplitple apps, this will not work correctly since iOS will not be able to decide where to redirect. There are 3 workarounds for this:
 
 1. before authorising your app with Dropbox, delete all other apps that uses Screenshot Uplaoder.
-2. contact Dropbox and ask them to implement custom URL schemes support.
+2. implement support for non sandboxed Dropbox apps 
+3. contact Dropbox and ask them to implement custom URL schemes support.
 
 If you plan to allow Screenshot Uploader also to Ad Hoc testers, make sure that you 'Enable Development Users' in your Dropbox app's details.
 
